@@ -44,7 +44,8 @@ if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
             exit 1
         fi
     elif command -v apt-get &> /dev/null; then
-        sudo apt-get update && sudo apt-get install -y "${MISSING_DEPS[@]}"
+        sudo apt-get update || true
+        sudo apt-get install -y "${MISSING_DEPS[@]}"
     elif command -v yum &> /dev/null; then
         sudo yum install -y "${MISSING_DEPS[@]}"
     elif command -v pacman &> /dev/null; then

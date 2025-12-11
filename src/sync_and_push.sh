@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # 获取脚本所在目录的绝对路径
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -43,7 +43,9 @@ log() {
 # --- 工具函数: 发送 macOS 系统通知 (仅在出错时触发) ---
 notify_error() {
     local message="$1"
-    osascript -e "display notification \"$message\" with title \"Obsidian Backup 失败\" subtitle \"请检查日志\" sound name \"Basso\""
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        osascript -e "display notification \"$message\" with title \"Obsidian Backup 失败\" subtitle \"请检查日志\" sound name \"Basso\""
+    fi
 }
 
 # --- 阶段 0: 日志清理 (Log Rotation) ---
@@ -63,13 +65,20 @@ cd "$DEST_DIR" || {
     exit 1
 }
 
+# 获取当前分支名称
+CURRENT_BRANCH=$(git branch --show-current)
+if [ -z "$CURRENT_BRANCH" ]; then
+    CURRENT_BRANCH="main" # Fallback if detection fails
+    log "⚠️ 无法检测到当前分支，默认使用: $CURRENT_BRANCH"
+fi
+
 # 修复 Git 中文乱码
 git config core.quotepath false
 
 # --- 阶段 2: 拉取远程更新 (Auto Pull) ---
 # 使用 rebase 模式可以保持提交历史整洁（可选 --rebase，这里用默认 merge 比较稳妥）
 log "🔄 正在检查远程更新 (Git Pull)..."
-git pull origin main >> "$LOG_FILE" 2>&1
+git pull origin "$CURRENT_BRANCH" >> "$LOG_FILE" 2>&1
 
 if [ $? -ne 0 ]; then
     log "⚠️ 警告: Git Pull 失败。可能是网络问题或存在冲突。将尝试继续执行 Rsync..."
@@ -97,7 +106,7 @@ if [[ -n $(git status -s) ]]; then
     git commit -m "Auto-save: $(date '+%Y-%m-%d %H:%M')" >> "$LOG_FILE" 2>&1
     
     log "🚀 正在推送到 GitHub..."
-    git push origin main >> "$LOG_FILE" 2>&1
+    git push origin "$CURRENT_BRANCH" >> "$LOG_FILE" 2>&1
     
     if [ $? -eq 0 ]; then
         log "✅ 成功: 已推送到 GitHub。"
