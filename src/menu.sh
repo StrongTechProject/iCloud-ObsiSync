@@ -60,10 +60,13 @@ do_configure() {
             NEW_DEST="${NEW_DEST#\"}"
             
             if [ -d "$NEW_DEST" ]; then
+                # 转义路径中的特殊字符 (e.g., & |) 以防止 sed 命令出错
+                ESCAPED_DEST=$(printf '%s\n' "$NEW_DEST" | sed 's:[&|]:\\&:g')
+
                 if [[ "$OSTYPE" == "darwin"* ]]; then
-                     sed -i '' "s|DEST_DIR=\".*\"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
+                     sed -i '' "s|DEST_DIR=\".*\"|DEST_DIR=\"$ESCAPED_DEST\"|g" "$CONFIG_FILE"
                 else
-                     sed -i "s|DEST_DIR=\".*\"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
+                     sed -i "s|DEST_DIR=\".*\"|DEST_DIR=\"$ESCAPED_DEST\"|g" "$CONFIG_FILE"
                 fi
                 echo "✅ Git 仓库路径已更新为: $NEW_DEST"
             else
@@ -77,14 +80,17 @@ do_configure() {
             NEW_LOG="${NEW_LOG#\"}"
             
             mkdir -p "$NEW_LOG"
-            NEW_LOG=$(cd "$NEW_LOG" && pwd)
+            NEW_LOG_ABS=$(cd "$NEW_LOG" && pwd)
+
+            # 转义路径中的特殊字符 (e.g., & |) 以防止 sed 命令出错
+            ESCAPED_LOG=$(printf '%s\n' "$NEW_LOG_ABS" | sed 's:[&|]:\\&:g')
 
             if [[ "$OSTYPE" == "darwin"* ]]; then
-                 sed -i '' "s|LOG_DIR=\".*\"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
+                 sed -i '' "s|LOG_DIR=\".*\"|LOG_DIR=\"$ESCAPED_LOG\"|g" "$CONFIG_FILE"
             else
-                 sed -i "s|LOG_DIR=\".*\"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
+                 sed -i "s|LOG_DIR=\".*\"|LOG_DIR=\"$ESCAPED_LOG\"|g" "$CONFIG_FILE"
             fi
-            echo "✅ 日志目录已更新为: $NEW_LOG"
+            echo "✅ 日志目录已更新为: $NEW_LOG_ABS"
             ;;
         3)
             echo "⏱️  [配置自动同步频率]"
@@ -110,24 +116,25 @@ do_configure() {
                 *) echo "❌ 无效选项"; return;;
             esac
 
-            # 备份现有 Crontab
-            crontab -l 2>/dev/null > /tmp/current_cron_backup
+            # 使用 mktemp 创建安全的临时文件，并通过管道操作简化流程
+            CRON_TMP_FILE=$(mktemp)
 
-            # 移除旧的本脚本任务
-            grep -v "$SYNC_SCRIPT" /tmp/current_cron_backup > /tmp/new_cron_clean
+            # 从当前 crontab 中移除旧任务，并将结果存入临时文件
+            # 使用 grep -F 可以确保将脚本路径作为固定字符串匹配，避免特殊字符问题
+            crontab -l 2>/dev/null | grep -v -F "$SYNC_SCRIPT" > "$CRON_TMP_FILE"
 
             if [ "$NEW_CRON_SCHEDULE" != "DISABLED" ] && [ -n "$NEW_CRON_SCHEDULE" ]; then
-                # 添加新任务
-                echo "$NEW_CRON_SCHEDULE $SYNC_SCRIPT" >> /tmp/new_cron_clean
-                echo "✅ 已生成新任务: $NEW_CRON_SCHEDULE $SYNC_SCRIPT"
+                # 添加新任务到临时文件
+                echo "$NEW_CRON_SCHEDULE $SYNC_SCRIPT" >> "$CRON_TMP_FILE"
+                echo "✅ 已配置新任务: $NEW_CRON_SCHEDULE"
             elif [ "$NEW_CRON_SCHEDULE" == "DISABLED" ]; then
                 echo "✅ 已禁用自动同步任务。"
             fi
 
-            # 应用新 Crontab
-            crontab /tmp/new_cron_clean
-            rm /tmp/current_cron_backup /tmp/new_cron_clean
-            echo "✅ Crontab 已更新。"
+            # 从临时文件加载新的 crontab
+            crontab "$CRON_TMP_FILE"
+            rm "$CRON_TMP_FILE" # 清理临时文件
+            echo "✅ Crontab 已成功更新。"
             ;;
         c|C)
             echo "已取消。"
