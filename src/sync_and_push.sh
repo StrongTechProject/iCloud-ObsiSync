@@ -1,18 +1,34 @@
 #!/bin/zsh
 
+# 获取脚本所在目录的绝对路径
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+CONFIG_FILE="$SCRIPT_DIR/config.sh"
+
 # ================= 配置区域 =================
 
-# 1. iCloud 源路径 (SOURCE)
+# 1. 默认配置 (如果 config.sh 不存在)
 SOURCE_DIR="/Users/your_username/Library/Mobile Documents/iCloud~md~obsidian/Documents/your_vault"
-
-# 2. 本地备份路径 (DESTINATION)
 DEST_DIR="/path/to/your/local/backup/folder"
-
-# 3. 日志文件
-LOG_FILE="/path/to/your/log/file.log"
-
-# 4. SSH Key 配置 (根据你的环境)
+LOG_DIR="$SCRIPT_DIR/logs"
 SSH_KEY_PATH="/path/to/your/private/ssh_key"
+LOG_RETENTION_DAYS=7
+
+# 2. 加载配置文件 (如果存在)
+if [ -f "$CONFIG_FILE" ]; then
+    # shellcheck source=config.sh
+    source "$CONFIG_FILE"
+fi
+
+# 3. 全局 Git SSH 配置
+# 确保后续所有 git 操作都使用指定的 SSH Key
+export GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes"
+
+# 4. 动态日志配置
+if [ ! -d "$LOG_DIR" ]; then
+    mkdir -p "$LOG_DIR"
+fi
+# 每日生成一个新的日志文件
+LOG_FILE="$LOG_DIR/backup-$(date '+%Y-%m-%d').log"
 
 # ===========================================
 
@@ -31,14 +47,10 @@ notify_error() {
 }
 
 # --- 阶段 0: 日志清理 (Log Rotation) ---
-# 如果日志超过 10000 行，则备份旧日志并清空当前日志
-if [ -f "$LOG_FILE" ]; then
-    LINE_COUNT=$(wc -l < "$LOG_FILE")
-    if [ "$LINE_COUNT" -gt 10000 ]; then
-        mv "$LOG_FILE" "${LOG_FILE}.old"
-        touch "$LOG_FILE"
-        log "♻️ 日志行数过多 ($LINE_COUNT 行)，已轮转为 backup.log.old"
-    fi
+# 清理超过 LOG_RETENTION_DAYS 天的旧日志
+if [ -d "$LOG_DIR" ]; then
+    find "$LOG_DIR" -name "backup-*.log" -type f -mtime +"$LOG_RETENTION_DAYS" -delete
+    # log "已清理 $LOG_RETENTION_DAYS 天前的旧日志" # 此时 log 函数尚未定义，且 LOG_FILE 刚确定
 fi
 
 log "=== 开始执行自动备份 ==="
@@ -57,7 +69,7 @@ git config core.quotepath false
 # --- 阶段 2: 拉取远程更新 (Auto Pull) ---
 # 使用 rebase 模式可以保持提交历史整洁（可选 --rebase，这里用默认 merge 比较稳妥）
 log "🔄 正在检查远程更新 (Git Pull)..."
-GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git pull origin main >> "$LOG_FILE" 2>&1
+git pull origin main >> "$LOG_FILE" 2>&1
 
 if [ $? -ne 0 ]; then
     log "⚠️ 警告: Git Pull 失败。可能是网络问题或存在冲突。将尝试继续执行 Rsync..."
@@ -85,7 +97,7 @@ if [[ -n $(git status -s) ]]; then
     git commit -m "Auto-save: $(date '+%Y-%m-%d %H:%M')" >> "$LOG_FILE" 2>&1
     
     log "🚀 正在推送到 GitHub..."
-    GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push origin main >> "$LOG_FILE" 2>&1
+    git push origin main >> "$LOG_FILE" 2>&1
     
     if [ $? -eq 0 ]; then
         log "✅ 成功: 已推送到 GitHub。"
