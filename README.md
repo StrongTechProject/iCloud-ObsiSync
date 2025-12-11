@@ -2,10 +2,10 @@
 
 [中文文档](README.zh.md) | [Documentation](docs/Doc.md)
 
-An automated tool to sync your Obsidian Vault from iCloud to a local Git repository and push changes to GitHub.
+An automated tool to sync your Obsidian Vault from iCloud or any local directory to a local Git repository and push changes to GitHub.
 
 ## Features
-- **Auto-Sync**: Mirrors iCloud folder to a local Git repo using `rsync`.
+- **Auto-Sync**: Conditionally mirrors your Obsidian vault to a local Git repo using `rsync`. Skips `rsync` if the vault is directly managed as a Git repository.
 - **Version Control**: Automatically commits and pushes changes to GitHub.
 - **Secure**: Sensitive configuration (paths, SSH keys) is separated and ignored by Git.
 - **Cron-Ready**: Optimized for running as a background cron job.
@@ -35,7 +35,7 @@ After installation, you can type `obsis` in your terminal to launch the manageme
    ```bash
    ./src/menu.sh
    ```
-   Select **Option 1 (Quick Start)** to configure your environment. You can also use this menu to **manage cron jobs (auto-sync frequency)**, view logs, or change settings later.
+   Select **Option 1 (Quick Start)** to configure your environment. The wizard now allows you to specify any Obsidian vault path (iCloud or local) and a Git repository path. If these paths are identical, the script will directly manage your vault with Git. You can also use this menu to **manage cron jobs (auto-sync frequency)**, view logs, or change settings later.
 
 2. **Manual Run**:
    ```bash

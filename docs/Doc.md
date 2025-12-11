@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This workflow is designed to automatically sync (mirror backup) an Obsidian Vault stored in **iCloud Drive** to a specified local directory, and use **Git** to commit and push all changes to a remote **GitHub** repository. This achieves automated version control and off-site backup for your Obsidian notes.
+This workflow is designed to automatically sync (mirror backup) an Obsidian Vault stored in **iCloud Drive or any local directory** to a specified local directory, and use **Git** to commit and push all changes to a remote **GitHub** repository. This achieves automated version control and off-site backup for your Obsidian notes.
 
 ### ✨ Key Features
 - **One-Click Install**: Provides an `install.sh` script to clone the repo and start the setup wizard.
@@ -33,7 +33,7 @@ obsis
 
 Menu Functions:
 *   **1. Quick Start**: Run the initial configuration wizard.
-    *   *The script will guide you to enter the iCloud source path, local Git repo path, and SSH Key.*
+    *   *The script will guide you to enter the Obsidian vault source path, local Git repo path, and SSH Key. If the Obsidian vault path and local Git repo path are identical, the script will perform Git operations directly on the vault without an intermediate Rsync sync.*
     *   *If your local repo lacks a remote address (Remote Origin), the script will guide you to add it.*
 *   **2. Check Sync Status**: Immediately run a sync and analyze the logs to report success or failure.
 *   **3. Modify Config**: 
@@ -99,7 +99,7 @@ If you prefer manual management, you can edit `crontab -e`:
    - Ensures the log directory exists (handles absolute paths).
 3. **Log Rotation**: Checks the log directory and automatically deletes old logs older than `LOG_RETENTION_DAYS` (default 7 days).
 4. **Git Pull**: Attempts to pull remote updates to prevent local commit conflicts.
-5. **Rsync Sync**: Mirrors the iCloud source directory to the local Git repo (with `--delete` flag to keep exact consistency).
+5. **Rsync Sync**: Conditionally mirrors the source directory to the local Git repo (with `--delete` flag to keep exact consistency). **This step is skipped if the source and destination directories are identical, allowing for direct Git management of the Obsidian vault.**
 6. **Git Push**: Checks for changes; if any, automatically commits and pushes to the remote `main` branch.
 
 ### 5.2 Security
