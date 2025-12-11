@@ -17,6 +17,8 @@
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
 ```
 
+安装完成后，您可以在终端输入 `obsis` 直接启动管理菜单。
+
 ## 📋 环境准备
 - **Git & GitHub 账号**: 你需要一个 GitHub 账号来存储你的笔记。
 - **SSH Key 配置**: 本工具使用 SSH 协议进行安全传输。
@@ -25,13 +27,21 @@
 ## 🚀 快速开始
 
 1. **初始化配置**:
+   运行安装脚本后，在终端输入 `obsis` 启动管理菜单，选择 `1. 快速开始`。
    ```bash
-   chmod +x src/setup.sh
+   obsis
+   ```
+   或者直接运行 `./src/setup.sh` (首次安装后已设置好执行权限)。
+   ```bash
    ./src/setup.sh
    ```
-   按照提示输入 iCloud 路径、Git 仓库路径和 SSH Key 路径。
+   按照提示输入 iCloud 路径、本地 Git 仓库路径和 SSH Key 路径。**在配置本地 Git 仓库时，如果检测到未配置远程仓库，脚本会引导您添加远程仓库地址。**
 
 2. **手动运行**:
+   ```bash
+   obsis
+   ```
+   在菜单中选择相应的选项，或者直接运行同步脚本：
    ```bash
    ./src/sync_and_push.sh
    ```
