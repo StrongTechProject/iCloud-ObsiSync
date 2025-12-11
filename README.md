@@ -1,4 +1,4 @@
-# Obsidian AutoSync
+# iCloud-ObsiSync
 
 [中文文档](README.zh.md) | [Documentation](docs/Doc.md)
 
@@ -9,6 +9,13 @@ An automated tool to sync your Obsidian Vault from iCloud to a local Git reposit
 - **Version Control**: Automatically commits and pushes changes to GitHub.
 - **Secure**: Sensitive configuration (paths, SSH keys) is separated and ignored by Git.
 - **Cron-Ready**: Optimized for running as a background cron job.
+
+## Installation
+
+**One-click Installation:**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/install.sh)"
+```
 
 ## Quick Start
 

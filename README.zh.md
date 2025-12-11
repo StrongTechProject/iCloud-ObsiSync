@@ -1,4 +1,4 @@
-# Obsidian AutoSync
+# iCloud-ObsiSync
 
 [English README](README.md) | [详细文档](docs/Doc.md)
 
@@ -9,6 +9,13 @@
 - **版本控制**: 自动提交变更 (Commit) 并推送到远程 GitHub 仓库。
 - **安全设计**: 敏感配置（路径、SSH Key）与代码分离，默认被 Git 忽略。
 - **Cron 友好**: 专为定时任务设计，支持自动日志轮转和绝对路径处理。
+
+## 📥 安装
+
+**一键安装命令:**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/install.sh)"
+```
 
 ## 🚀 快速开始
 

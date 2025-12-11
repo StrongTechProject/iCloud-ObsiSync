@@ -1,10 +1,11 @@
-# 📚 Obsidian Vault 自动 Git 同步流程文档
+# 📚 iCloud-ObsiSync 自动同步流程文档
 
 ## 1. 流程概述
 
 本流程旨在将存储在 **iCloud Drive** 中的 Obsidian Vault 笔记库自动同步（镜像备份）到本地指定目录，并利用 **Git** 工具将所有变动提交（Commit）并推送到 **GitHub** 远程仓库，实现 Obsidian 笔记的自动化版本管理和异地备份。
 
 ### ✨ 主要功能
+- **一键安装**: 提供 `install.sh` 脚本，自动克隆并启动配置向导。
 - **自动配置向导**: 提供 `setup.sh` 脚本，交互式完成环境配置。
 - **安全配置分离**: 配置文件 `config.sh` 包含敏感路径，默认被 Git 忽略，防止泄露。
 - **智能日志管理**: 按日期生成日志，自动清理过期日志，支持绝对路径（适配 Cron）。
@@ -14,12 +15,19 @@
 
 ## 2. 快速开始 (Quick Start)
 
-### 2.1 初始化配置
-我们提供了一个交互式脚本来帮助你快速生成配置文件。
+### 2.1 安装与配置
+
+**推荐使用一键安装脚本：**
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/install.sh)"
+```
+该脚本会自动克隆仓库并运行配置向导。
+
+**或者手动配置：**
 
 1. 打开终端，进入项目目录：
    ```bash
-   cd /path/to/Obsidian_AutoSync
+   cd /path/to/iCloud-ObsiSync
    ```
 
 2. 运行初始化脚本：
@@ -45,7 +53,8 @@
 
 | **文件/目录** | **路径示例** | **说明** |
 | :--- | :--- | :--- |
-| **初始化脚本** | `src/setup.sh` | **首次使用运行此脚本**。用于生成配置文件和检查环境。 |
+| **安装脚本** | `install.sh` | **一键安装入口**。负责克隆仓库和启动配置。 |
+| **初始化脚本** | `src/setup.sh` | **配置向导**。用于生成配置文件和检查环境。 |
 | **核心脚本** | `src/sync_and_push.sh` | **定时任务调用的目标**。执行同步、提交和推送的核心逻辑。 |
 | **配置文件** | `src/config.sh` | 由 `setup.sh` 生成。包含路径、SSH Key 等敏感配置。**已加入 .gitignore**。 |
 | **日志目录** | `src/logs/` (默认) | 存放每日执行日志 (如 `backup-2025-12-11.log`)。路径可在配置中自定义。 |
@@ -64,7 +73,7 @@
 
 2. 添加定时任务 (示例：每 20 分钟执行一次)：
    ```cron
-   */20 * * * * /path/to/Obsidian_AutoSync/src/sync_and_push.sh
+   */20 * * * * /path/to/iCloud-ObsiSync/src/sync_and_push.sh
    ```
    *> 注意：请确保填写脚本的**绝对路径**。*
 
