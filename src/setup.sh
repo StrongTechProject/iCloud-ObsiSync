@@ -31,10 +31,11 @@ if [ $MISSING_DEPS -ne 0 ]; then
     exit 1
 fi
 
-# 1. 获取 iCloud 源路径
+# 1. 获取 Obsidian 源路径
 while true; do
     echo ""
-    echo "👉 请输入 Obsidian iCloud 源目录路径 (Source):"
+    echo "👉 请输入 Obsidian 运行目录/源目录路径 (Source):"
+    echo "   (通常是你的 Obsidian Vault 路径)"
     echo "   (提示: 你可以直接将文件夹拖入此终端窗口)"
     read -e -p "Path: " SOURCE_DIR
     # 去除可能存在的引号（macOS 拖拽可能会加引号）
@@ -53,6 +54,7 @@ done
 while true; do
     echo ""
     echo "👉 请输入本地 Git 仓库目标路径 (Destination):"
+    echo "   (注意：如果你希望直接对源目录进行 Git 管理而不建立备份副本，请在此输入与上面相同的路径)"
     read -e -p "Path: " DEST_DIR
     DEST_DIR="${DEST_DIR%\"}"
     DEST_DIR="${DEST_DIR#\"}"

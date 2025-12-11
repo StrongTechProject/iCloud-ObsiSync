@@ -89,13 +89,21 @@ fi
 
 # --- 阶段 3: 从 iCloud 镜像同步 (Rsync) ---
 # 注意：此时我们已经在 DEST_DIR 里面了
-log "📂 开始 Rsync 同步..."
-rsync -av --delete --exclude '.git' --exclude '.DS_Store' "$SOURCE_DIR/" "$DEST_DIR/" >> "$LOG_FILE" 2>&1
+# 比较 Source 和 Dest 是否相同（标准化路径后比较）
+REAL_SOURCE=$(cd "$SOURCE_DIR" 2>/dev/null && pwd)
+REAL_DEST=$(cd "$DEST_DIR" 2>/dev/null && pwd)
 
-if [ $? -ne 0 ]; then
-    log "❌ 错误: Rsync 同步失败 (状态码 $?)。"
-    notify_error "Rsync 文件同步失败"
-    exit 1
+if [[ "$REAL_SOURCE" == "$REAL_DEST" ]]; then
+    log "📂 检测到源目录与目标目录相同，跳过 Rsync 同步，直接进行 Git 提交..."
+else
+    log "📂 开始 Rsync 同步..."
+    rsync -av --delete --exclude '.git' --exclude '.DS_Store' "$SOURCE_DIR/" "$DEST_DIR/" >> "$LOG_FILE" 2>&1
+
+    if [ $? -ne 0 ]; then
+        log "❌ 错误: Rsync 同步失败 (状态码 $?)。"
+        notify_error "Rsync 文件同步失败"
+        exit 1
+    fi
 fi
 
 # --- 阶段 4: 提交与推送 (Commit & Push) ---
