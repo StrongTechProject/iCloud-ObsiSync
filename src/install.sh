@@ -103,7 +103,39 @@ else
     git clone "$REPO_URL" "$INSTALL_DIR"
 fi
 
-# 4. 启动管理菜单
+# 4. 创建快捷指令 'obsis'
+echo "🔗 正在配置快捷指令 'obsis'..."
+TARGET_BIN="/usr/local/bin/obsis"
+# 使用 exec 确保 wrapper 不会吞掉信号，并且 BASH_SOURCE 指向正确
+WRAPPER_CONTENT="#!/bin/bash
+exec \"$INSTALL_DIR/src/menu.sh\" \"\$@\""
+
+# 尝试写入 wrapper
+create_shortcut() {
+    if [ -w "/usr/local/bin" ]; then
+        echo "$WRAPPER_CONTENT" > "$TARGET_BIN"
+        chmod +x "$TARGET_BIN"
+        return 0
+    else
+        echo "⚠️  正在尝试使用 sudo 创建快捷指令到 $TARGET_BIN ..."
+        echo "   (需要管理员权限来写入 /usr/local/bin)"
+        if echo "$WRAPPER_CONTENT" | sudo tee "$TARGET_BIN" > /dev/null; then
+             sudo chmod +x "$TARGET_BIN"
+             return 0
+        else
+             return 1
+        fi
+    fi
+}
+
+if create_shortcut; then
+    echo "✅ 快捷指令已创建成功！以后只需在终端输入 'obsis' 即可打开菜单。"
+else
+    echo "❌ 快捷指令创建失败 (权限不足或取消)。"
+    echo "   您仍然可以通过进入目录并运行 './src/menu.sh' 来使用。"
+fi
+
+# 5. 启动管理菜单
 echo "⚙️  正在启动管理菜单..."
 cd "$INSTALL_DIR"
 chmod +x src/*.sh
