@@ -273,6 +273,57 @@ SSH_KEY_PATH="$SSH_KEY_PATH"
 LOG_RETENTION_DAYS=$DEFAULT_LOG_RETENTION
 EOF
 
+# 6. 配置自动同步频率 (Crontab)
+echo ""
+echo "--------------------------------------------------"
+echo "⏱️  配置自动同步频率"
+echo "您可以现在设置自动同步任务，或者稍后在菜单中配置。"
+echo "--------------------------------------------------"
+
+echo "请选择预设频率:"
+echo "  1. 每 15 分钟 (推荐)"
+echo "  2. 每小时"
+echo "  3. 每天 (凌晨 2:00)"
+echo "  4. 暂不设置 (手动运行)"
+
+read -p "请选择 [1-4]: " cron_choice
+
+SYNC_SCRIPT="$SCRIPT_DIR/sync_and_push.sh"
+NEW_CRON_SCHEDULE=""
+
+case "$cron_choice" in
+    1) NEW_CRON_SCHEDULE="*/15 * * * *";;
+    2) NEW_CRON_SCHEDULE="0 * * * *";;
+    3) NEW_CRON_SCHEDULE="0 2 * * *";;
+    4) NEW_CRON_SCHEDULE="";;
+    *) echo "   无效选项，默认不设置。"; NEW_CRON_SCHEDULE="";;
+esac
+
+if [ -n "$NEW_CRON_SCHEDULE" ]; then
+    echo "   正在配置 Crontab..."
+    
+    # 使用 mktemp 创建安全的临时文件
+    CRON_TMP_FILE=$(mktemp)
+
+    # 从当前 crontab 中移除旧任务（如果有），并将结果存入临时文件
+    # 使用 grep -F 确保精确匹配路径字符串
+    crontab -l 2>/dev/null | grep -v -F "$SYNC_SCRIPT" > "$CRON_TMP_FILE"
+
+    # 添加新任务
+    echo "$NEW_CRON_SCHEDULE $SYNC_SCRIPT" >> "$CRON_TMP_FILE"
+
+    # 应用新 Crontab
+    if crontab "$CRON_TMP_FILE"; then
+        echo "✅ 自动同步任务已启用: $NEW_CRON_SCHEDULE"
+    else
+        echo "❌ Crontab 更新失败。"
+    fi
+    
+    rm "$CRON_TMP_FILE"
+else
+    echo "   已跳过自动同步设置。"
+fi
+
 echo "--------------------------------------------------"
 echo "🎉 配置完成！"
 echo "请确保你的主脚本 (sync_and_push.sh) 包含以下代码来加载配置："
