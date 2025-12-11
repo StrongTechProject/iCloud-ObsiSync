@@ -1,10 +1,11 @@
 # macOS
 .DS_Store
-.idea
-*.log
+
+# Configuration
 config.sh
-src/config.sh
-src/logs/
+
+# Logs
+*.log
 logs/
 
 # Temporary files
