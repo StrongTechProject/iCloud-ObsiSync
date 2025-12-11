@@ -48,8 +48,8 @@ do_change_paths() {
             echo "请输入新的 Git 仓库路径:"
             read -e -p "Path: " NEW_DEST
             # 去除引号
-            NEW_DEST="${NEW_DEST%"}"
-            NEW_DEST="${NEW_DEST#"}"
+            NEW_DEST="${NEW_DEST%\"}"
+            NEW_DEST="${NEW_DEST#\"}"
             
             if [ -d "$NEW_DEST" ]; then
                 # 使用 sed 替换配置文件中的 DEST_DIR 行
@@ -67,8 +67,9 @@ do_change_paths() {
         2)
             echo "请输入新的日志目录路径:"
             read -e -p "Path: " NEW_LOG
-            NEW_LOG="${NEW_LOG%"}"
-            NEW_LOG="${NEW_LOG#"}"
+            # 去除引号
+            NEW_LOG="${NEW_LOG%\"}"
+            NEW_LOG="${NEW_LOG#\"}"
             
             # 创建目录并转绝对路径
             mkdir -p "$NEW_LOG"
