@@ -59,9 +59,10 @@ while true; do
 
     if [ -d "$DEST_DIR" ]; then
         if [ -w "$DEST_DIR" ]; then
-             if [ -d "$DEST_DIR/.git" ]; then
+            IS_GIT_REPO=0
+            if [ -d "$DEST_DIR/.git" ]; then
                 echo "✅ 目标路径是一个有效的 Git 仓库."
-                break
+                IS_GIT_REPO=1
             else
                 echo "⚠️  警告: 目标路径存在，但似乎不是 Git 仓库 (未找到 .git)。"
                 read -p "   是否初始化该目录为 Git 仓库? (y/n): " init_confirm
@@ -69,13 +70,53 @@ while true; do
                     echo "正在 $DEST_DIR 初始化 Git 仓库..."
                     git -C "$DEST_DIR" init
                     echo "✅ Git 仓库已成功初始化."
-                    break
+                    IS_GIT_REPO=1
                 else
                     read -p "   是否继续而不初始化? (y/n): " continue_confirm
                     if [[ "$continue_confirm" == "y" || "$continue_confirm" == "Y" ]]; then
                         break
                     fi
                 fi
+            fi
+
+            if [ $IS_GIT_REPO -eq 1 ]; then
+                # 检查远程仓库配置
+                if ! git -C "$DEST_DIR" remote get-url origin &>/dev/null; then
+                    echo "⚠️  警告: 未检测到远程仓库配置 (remote 'origin')。"
+                    read -p "   是否需要配置远程仓库地址? (y/n): " remote_confirm
+                    if [[ "$remote_confirm" == "y" || "$remote_confirm" == "Y" ]]; then
+                        while true; do
+                            read -e -p "   请输入远程仓库 URL (例如 git@github.com:user/repo.git): " REMOTE_URL
+                            if [[ -n "$REMOTE_URL" ]]; then
+                                # 检查 remote 'origin' 是否已存在
+                                if git -C "$DEST_DIR" remote | grep -q '^origin$'; then
+                                    echo "   检测到已存在的 remote 'origin'，将更新其 URL..."
+                                    git -C "$DEST_DIR" remote set-url origin "$REMOTE_URL"
+                                else
+                                    git -C "$DEST_DIR" remote add origin "$REMOTE_URL"
+                                fi
+
+                                # 通过回读 URL 来验证操作是否真的成功
+                                if [[ "$(git -C "$DEST_DIR" remote get-url origin)" == "$REMOTE_URL" ]]; then
+                                    echo "✅ 远程仓库 'origin' 已成功配置."
+                                    # 尝试将当前分支重命名为 main (现代 Git 仓库的推荐做法)
+                                    git -C "$DEST_DIR" branch -M main
+                                    break
+                                else
+                                    echo "❌ 远程仓库配置失败，请检查 URL 或权限后重试。"
+                                fi
+                            else
+                                echo "❌ URL 不能为空。"
+                            fi
+                        done
+                    else
+                        echo "⚠️  已跳过远程配置。请稍后手动运行 'git remote add origin <url>'。"
+                    fi
+                else
+                    EXISTING_URL=$(git -C "$DEST_DIR" remote get-url origin)
+                    echo "✅ 已检测到远程仓库: $EXISTING_URL"
+                fi
+                break
             fi
         else
              echo "❌ 错误: 对目标路径没有写入权限，请检查权限设置。"
