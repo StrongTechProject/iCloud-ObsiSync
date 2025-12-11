@@ -4,10 +4,13 @@
 # Obsidian AutoSync 管理菜单
 # ==========================================
 
-# 获取脚本所在目录 (项目根目录)
-PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CONFIG_FILE="$PROJECT_ROOT/src/config.sh"
-SETUP_SCRIPT="$PROJECT_ROOT/src/setup.sh"
+# 获取脚本所在目录 (src 目录)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# 项目根目录
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+CONFIG_FILE="$SCRIPT_DIR/config.sh"
+SETUP_SCRIPT="$SCRIPT_DIR/setup.sh"
 
 # 加载配置函数
 load_config() {
@@ -124,7 +127,7 @@ do_uninstall() {
     if [[ "$confirm" == "yes" ]]; then
         echo "正在删除..."
         rm -f "$CONFIG_FILE"
-        rm -rf "${PROJECT_ROOT}/src/logs" # 删除默认日志目录
+        rm -rf "${SCRIPT_DIR}/logs" # 删除默认日志目录
         
         echo "✅ 配置文件已删除。"
         echo "⚠️  请执行以下命令完全删除项目文件夹:"
@@ -136,6 +139,91 @@ do_uninstall() {
 }
 
 # 主循环
+
 while true; do
+
+    # 清屏以获得更好的菜单体验
+
+    clear
+
     echo ""
-    echo "==========================================
+
+    echo "==========================================="
+
+    echo "    Obsidian AutoSync 管理菜单"
+
+    echo "==========================================="
+
+    echo " 1. 快速开始 (初始化或重置配置)"
+
+    echo " 2. 更改 Git 仓库或日志路径"
+
+    echo " 3. 查看实时同步日志"
+
+    echo " 4. 卸载"
+
+    echo " q. 退出"
+
+    echo "-------------------------------------------"
+
+    read -p "请输入选项 [1-4, q]: " choice
+
+
+
+    case "$choice" in
+
+        1)
+
+            do_setup
+
+            ;;
+
+        2)
+
+            do_change_paths
+
+            ;;
+
+        3)
+
+            do_view_logs
+
+            ;;
+
+        4)
+
+            do_uninstall
+
+            ;;
+
+        q|Q)
+
+            echo "👋 感谢使用，再见!"
+
+            exit 0
+
+            ;;
+
+        *)
+
+            echo "❌ 无效选项，请重试。"
+
+            ;;
+
+    esac
+
+    
+
+    # 对需要暂停的操作进行处理，提升用户体验
+
+    # 查看日志 (3) 和退出 (q) 不需要暂停
+
+    if [[ "$choice" =~ ^[124]$ ]]; then
+
+        echo ""
+
+        read -n 1 -s -r -p "按任意键返回主菜单..."
+
+    fi
+
+done

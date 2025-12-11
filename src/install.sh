@@ -66,11 +66,12 @@ if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
 fi
 
 # 2. 准备安装目录
-# 获取脚本所在的真实目录
+# 获取脚本所在的真实目录 (src)
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # 判断脚本是否已经在目标安装目录中运行
-if [[ "$SCRIPT_DIR" == "$INSTALL_DIR" ]]; then
+if [[ "$PROJECT_ROOT" == "$INSTALL_DIR" ]]; then
     echo "✅ 脚本正在安装目录中运行，跳过克隆步骤。"
 else
     if [ -d "$INSTALL_DIR" ]; then
