@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*~
+.#*
+.#*#
+
+# Gemini CLI temporary directory
+.gemini/
