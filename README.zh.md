@@ -1,6 +1,6 @@
 # iCloud-ObsiSync
 
-[English README](README.md) | [详细文档](docs/Doc.md)
+[English README](README.md) | [详细文档](docs/zh/Doc.zh.md)
 
 一个用于将 iCloud 中的 Obsidian 笔记库自动同步到本地 Git 仓库并推送到 GitHub 的工具。
 
@@ -22,7 +22,7 @@
 ## 📋 环境准备
 - **Git & GitHub 账号**: 你需要一个 GitHub 账号来存储你的笔记。
 - **SSH Key 配置**: 本工具使用 SSH 协议进行安全传输。
-  > 🆕 **新手必读**: 如果你没有配置过，请查看 [Git SSH 配置指南 (新手向)](docs/Git_SSH_Config_Guide.md) 了解详细步骤。
+  > 🆕 **新手必读**: 如果你没有配置过，请查看 [Git SSH 配置指南 (新手向)](docs/zh/Git_SSH_Config_Guide.zh.md) 了解详细步骤。
 
 ## 🚀 快速开始
 
@@ -49,4 +49,4 @@
 3. **设置定时任务**:
    使用 `crontab -e` 添加定时任务，实现全自动备份。
 
-详细说明请参考 [详细文档](docs/Doc.md)。
+详细说明请参考 [详细文档](docs/zh/Doc.zh.md)。
