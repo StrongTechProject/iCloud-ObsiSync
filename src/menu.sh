@@ -32,7 +32,51 @@ do_setup() {
     fi
 }
 
-# 2. 修改配置
+# 2. 检查同步状态 (立即同步)
+do_check_status() {
+    echo "🔄 [立即同步并检查状态]"
+    if ! load_config; then return; fi
+    
+    SYNC_SCRIPT="$SCRIPT_DIR/sync_and_push.sh"
+    if [ ! -x "$SYNC_SCRIPT" ]; then
+        echo "❌ 错误: 找不到同步脚本 $SYNC_SCRIPT"
+        return
+    fi
+
+    echo "⏳ 正在执行同步 (这可能需要几秒钟)..."
+    "$SYNC_SCRIPT"
+    
+    # 检查最新的日志文件
+    if [ ! -d "$LOG_DIR" ]; then
+        echo "❌ 错误: 日志目录不存在。"
+        return
+    fi
+    
+    LATEST_LOG=$(find "$LOG_DIR" -name "backup-*.log" -type f | sort -r | head -n 1)
+    
+    if [ -f "$LATEST_LOG" ]; then
+        echo "📄 分析日志: $(basename "$LATEST_LOG")"
+        echo "-----------------------------------"
+        
+        # 简单的日志分析逻辑
+        if grep -q "✅ 成功: 已推送到 GitHub" "$LATEST_LOG"; then
+            echo "✅ 状态: 同步成功 (有更新已推送)"
+        elif grep -q "☕ 无变动，跳过推送" "$LATEST_LOG"; then
+            echo "✅ 状态: 同步成功 (无本地变动)"
+        elif grep -q "❌ 错误" "$LATEST_LOG" || grep -q "❌ 致命错误" "$LATEST_LOG"; then
+            echo "❌ 状态: 同步失败 (请查看详细日志)"
+            echo "   关键错误信息:"
+            grep "❌" "$LATEST_LOG" | tail -n 3
+        else
+            echo "⚠️  状态: 未知 (无法从日志中判断)"
+        fi
+        echo "-----------------------------------"
+    else
+        echo "❌ 错误: 未找到生成的日志文件。"
+    fi
+}
+
+# 3. 修改配置
 do_configure() {
     echo "🔧 [修改配置]"
     if ! load_config; then return; fi
@@ -145,7 +189,7 @@ do_configure() {
     esac
 }
 
-# 3. 查看日志
+# 4. 查看日志
 do_view_logs() {
     echo "📄 [查看日志]"
     if ! load_config; then return; fi
@@ -168,7 +212,7 @@ do_view_logs() {
     fi
 }
 
-# 4. 卸载项目
+# 5. 卸载项目
 do_uninstall() {
     echo "🗑️  [卸载项目]"
     echo "⚠️  警告: 这将删除配置文件和本项目代码。"
@@ -211,17 +255,19 @@ while true; do
 
     echo " 1. 快速开始 (初始化或重置配置)"
 
-    echo " 2. 修改配置"
+    echo " 2. 检查同步状态 (立即同步)"
 
-    echo " 3. 查看实时同步日志"
+    echo " 3. 修改配置"
 
-    echo " 4. 卸载"
+    echo " 4. 查看实时同步日志"
+
+    echo " 5. 卸载"
 
     echo " q. 退出"
 
     echo "-------------------------------------------"
 
-    read -p "请输入选项 [1-4, q]: " choice
+    read -p "请输入选项 [1-5, q]: " choice
 
 
 
@@ -235,17 +281,23 @@ while true; do
 
         2)
 
-            do_configure
+            do_check_status
 
             ;;
 
         3)
 
-            do_view_logs
+            do_configure
 
             ;;
 
         4)
+
+            do_view_logs
+
+            ;;
+
+        5)
 
             do_uninstall
 
@@ -271,9 +323,9 @@ while true; do
 
     # 对需要暂停的操作进行处理，提升用户体验
 
-    # 查看日志 (3) 和退出 (q) 不需要暂停
+    # 查看日志 (4) 和退出 (q) 不需要暂停
 
-    if [[ "$choice" =~ ^[124]$ ]]; then
+    if [[ "$choice" =~ ^[1235]$ ]]; then
 
         echo ""
 
