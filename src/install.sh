@@ -10,7 +10,19 @@ set -e
 GITHUB_USER="StrongTechProject"
 REPO_NAME="iCloud-ObsiSync"
 REPO_URL="https://github.com/${GITHUB_USER}/${REPO_NAME}.git"
-INSTALL_DIR="$HOME/${REPO_NAME}"
+
+# 智能判断安装目录
+# 获取脚本所在的真实目录 (src) - 用于检测是否本地运行
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" 2>/dev/null && pwd )" || true
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# 如果脚本是在 Git 仓库内运行 (本地执行)，则使用当前根目录
+if [[ -d "$SCRIPT_DIR" ]] && [[ -f "$SCRIPT_DIR/install.sh" ]]; then
+    INSTALL_DIR="$PROJECT_ROOT"
+else
+    # 否则 (curl 运行)，安装到当前执行目录下的子文件夹
+    INSTALL_DIR="$(pwd)/${REPO_NAME}"
+fi
 
 echo "--------------------------------------------------"
 echo "🚀 开始安装 Obsidian AutoSync"
@@ -66,9 +78,6 @@ if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
 fi
 
 # 2. 准备安装目录
-# 获取脚本所在的真实目录 (src)
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # 判断脚本是否已经在目标安装目录中运行
 if [[ "$PROJECT_ROOT" == "$INSTALL_DIR" ]]; then
