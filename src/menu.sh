@@ -55,9 +55,9 @@ do_change_paths() {
                 # 使用 sed 替换配置文件中的 DEST_DIR 行
                 # 使用 | 作为分隔符避免路径中的 / 冲突
                 if [[ "$OSTYPE" == "darwin"* ]]; then
-                     sed -i '' "s|DEST_DIR=".*"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
+                     sed -i '' "s|DEST_DIR=\".*\"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
                 else
-                     sed -i "s|DEST_DIR=".*"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
+                     sed -i "s|DEST_DIR=\".*\"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
                 fi
                 echo "✅ Git 仓库路径已更新为: $NEW_DEST"
             else
@@ -75,9 +75,9 @@ do_change_paths() {
             NEW_LOG=$(cd "$NEW_LOG" && pwd)
 
             if [[ "$OSTYPE" == "darwin"* ]]; then
-                 sed -i '' "s|LOG_DIR=".*"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
+                 sed -i '' "s|LOG_DIR=\".*\"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
             else
-                 sed -i "s|LOG_DIR=".*"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
+                 sed -i "s|LOG_DIR=\".*\"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
             fi
             echo "✅ 日志目录已更新为: $NEW_LOG"
             ;;
