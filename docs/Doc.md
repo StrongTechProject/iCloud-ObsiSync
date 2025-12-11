@@ -19,11 +19,22 @@
 
 **推荐使用一键安装脚本：**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
 ```
 该脚本会自动克隆仓库并运行配置向导。
 
-**或者手动配置：**
+**管理与配置：**
+
+推荐使用交互式菜单进行管理：
+```bash
+./src/menu.sh
+```
+*   **1. 快速开始**: 运行初始化配置向导。
+*   **2. 更改路径**: 修改 Git 仓库或日志存储路径。
+*   **3. 查看日志**: 实时查看最新同步日志。
+*   **4. 卸载**: 清理项目文件。
+
+**或者手动运行初始化脚本：**
 
 1. 打开终端，进入项目目录：
    ```bash
@@ -53,7 +64,8 @@
 
 | **文件/目录** | **路径示例** | **说明** |
 | :--- | :--- | :--- |
-| **安装脚本** | `install.sh` | **一键安装入口**。负责克隆仓库和启动配置。 |
+| **管理菜单** | `src/menu.sh` | **推荐入口**。提供配置、日志查看、卸载等一站式管理功能。 |
+| **安装脚本** | `src/install.sh` | **一键安装入口**。负责克隆仓库和启动配置。 |
 | **初始化脚本** | `src/setup.sh` | **配置向导**。用于生成配置文件和检查环境。 |
 | **核心脚本** | `src/sync_and_push.sh` | **定时任务调用的目标**。执行同步、提交和推送的核心逻辑。 |
 | **配置文件** | `src/config.sh` | 由 `setup.sh` 生成。包含路径、SSH Key 等敏感配置。**已加入 .gitignore**。 |

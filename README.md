@@ -14,18 +14,18 @@ An automated tool to sync your Obsidian Vault from iCloud to a local Git reposit
 
 **One-click Installation:**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
 ```
 
 ## Quick Start
 
-1. **Setup**:
+1. **Management Menu** (Recommended):
    ```bash
-   ./src/setup.sh
+   ./src/menu.sh
    ```
-   Follow the prompts to configure your source, destination, and SSH key.
+   Select **Option 1 (Quick Start)** to configure your environment. You can also use this menu to view logs or change settings later.
 
-2. **Run**:
+2. **Manual Run**:
    ```bash
    ./src/sync_and_push.sh
    ```
