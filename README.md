@@ -17,6 +17,11 @@ An automated tool to sync your Obsidian Vault from iCloud to a local Git reposit
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
 ```
 
+## Prerequisites
+- **Git & GitHub Account**: You need a GitHub account to store your vault remotely.
+- **SSH Key**: This tool uses SSH to push changes securely without passwords.
+  > 🆕 **New to Git?** Check out our [Beginner's Guide to SSH Key Configuration](docs/Git_SSH_Config_Guide.md) for step-by-step instructions.
+
 ## Quick Start
 
 1. **Management Menu** (Recommended):

@@ -14,8 +14,13 @@
 
 **一键安装命令:**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
 ```
+
+## 📋 环境准备
+- **Git & GitHub 账号**: 你需要一个 GitHub 账号来存储你的笔记。
+- **SSH Key 配置**: 本工具使用 SSH 协议进行安全传输。
+  > 🆕 **新手必读**: 如果你没有配置过，请查看 [Git SSH 配置指南 (新手向)](docs/Git_SSH_Config_Guide.md) 了解详细步骤。
 
 ## 🚀 快速开始
 
