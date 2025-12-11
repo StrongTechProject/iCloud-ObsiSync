@@ -32,28 +32,34 @@ do_setup() {
     fi
 }
 
-# 2. 更改路径
-do_change_paths() {
-    echo "🔧 [更改路径设置]"
+# 2. 修改配置
+do_configure() {
+    echo "🔧 [修改配置]"
     if ! load_config; then return; fi
 
     echo "当前配置:"
     echo "  1. Git 仓库路径 (DEST_DIR): $DEST_DIR"
     echo "  2. 日志目录 (LOG_DIR):     $LOG_DIR"
+    
+    # 检查 Crontab 状态
+    SYNC_SCRIPT="$SCRIPT_DIR/sync_and_push.sh"
+    CRON_JOB=$(crontab -l 2>/dev/null | grep "$SYNC_SCRIPT")
+    if [ -n "$CRON_JOB" ]; then
+        echo "  3. 自动同步频率:           已启用 ($CRON_JOB)"
+    else
+        echo "  3. 自动同步频率:           未启用"
+    fi
     echo ""
 
-    read -p "你要修改哪一项? (1/2/c取消): " choice
+    read -p "你要修改哪一项? (1/2/3/c取消): " choice
     case "$choice" in
         1)
             echo "请输入新的 Git 仓库路径:"
             read -e -p "Path: " NEW_DEST
-            # 去除引号
             NEW_DEST="${NEW_DEST%\"}"
             NEW_DEST="${NEW_DEST#\"}"
             
             if [ -d "$NEW_DEST" ]; then
-                # 使用 sed 替换配置文件中的 DEST_DIR 行
-                # 使用 | 作为分隔符避免路径中的 / 冲突
                 if [[ "$OSTYPE" == "darwin"* ]]; then
                      sed -i '' "s|DEST_DIR=\".*\"|DEST_DIR=\"$NEW_DEST\"|g" "$CONFIG_FILE"
                 else
@@ -67,11 +73,9 @@ do_change_paths() {
         2)
             echo "请输入新的日志目录路径:"
             read -e -p "Path: " NEW_LOG
-            # 去除引号
             NEW_LOG="${NEW_LOG%\"}"
             NEW_LOG="${NEW_LOG#\"}"
             
-            # 创建目录并转绝对路径
             mkdir -p "$NEW_LOG"
             NEW_LOG=$(cd "$NEW_LOG" && pwd)
 
@@ -81,6 +85,49 @@ do_change_paths() {
                  sed -i "s|LOG_DIR=\".*\"|LOG_DIR=\"$NEW_LOG\"|g" "$CONFIG_FILE"
             fi
             echo "✅ 日志目录已更新为: $NEW_LOG"
+            ;;
+        3)
+            echo "⏱️  [配置自动同步频率]"
+            echo "请选择预设频率:"
+            echo "  1. 每 15 分钟 (推荐)"
+            echo "  2. 每小时"
+            echo "  3. 每天 (凌晨 2:00)"
+            echo "  4. 禁用自动同步"
+            echo "  5. 手动输入 Cron 表达式"
+            
+            read -p "请选择 [1-5]: " cron_choice
+            
+            NEW_CRON_SCHEDULE=""
+            case "$cron_choice" in
+                1) NEW_CRON_SCHEDULE="*/15 * * * *";;
+                2) NEW_CRON_SCHEDULE="0 * * * *";;
+                3) NEW_CRON_SCHEDULE="0 2 * * *";;
+                4) NEW_CRON_SCHEDULE="DISABLED";;
+                5) 
+                   echo "请输入 Cron 表达式 (例如 '*/30 * * * *'):"
+                   read -e -p "Cron: " NEW_CRON_SCHEDULE
+                   ;;
+                *) echo "❌ 无效选项"; return;;
+            esac
+
+            # 备份现有 Crontab
+            crontab -l 2>/dev/null > /tmp/current_cron_backup
+
+            # 移除旧的本脚本任务
+            grep -v "$SYNC_SCRIPT" /tmp/current_cron_backup > /tmp/new_cron_clean
+
+            if [ "$NEW_CRON_SCHEDULE" != "DISABLED" ] && [ -n "$NEW_CRON_SCHEDULE" ]; then
+                # 添加新任务
+                echo "$NEW_CRON_SCHEDULE $SYNC_SCRIPT" >> /tmp/new_cron_clean
+                echo "✅ 已生成新任务: $NEW_CRON_SCHEDULE $SYNC_SCRIPT"
+            elif [ "$NEW_CRON_SCHEDULE" == "DISABLED" ]; then
+                echo "✅ 已禁用自动同步任务。"
+            fi
+
+            # 应用新 Crontab
+            crontab /tmp/new_cron_clean
+            rm /tmp/current_cron_backup /tmp/new_cron_clean
+            echo "✅ Crontab 已更新。"
             ;;
         c|C)
             echo "已取消。"
@@ -157,7 +204,7 @@ while true; do
 
     echo " 1. 快速开始 (初始化或重置配置)"
 
-    echo " 2. 更改 Git 仓库或日志路径"
+    echo " 2. 修改配置"
 
     echo " 3. 查看实时同步日志"
 
@@ -181,7 +228,7 @@ while true; do
 
         2)
 
-            do_change_paths
+            do_configure
 
             ;;
 
