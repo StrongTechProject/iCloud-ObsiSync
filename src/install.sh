@@ -94,10 +94,10 @@ else
     git clone "$REPO_URL" "$INSTALL_DIR"
 fi
 
-# 4. 运行配置向导
-echo "⚙️  正在启动配置向导..."
+# 4. 启动管理菜单
+echo "⚙️  正在启动管理菜单..."
 cd "$INSTALL_DIR"
 chmod +x src/*.sh
 
-# 启动交互式配置
-./src/setup.sh
+# 启动管理菜单
+./src/menu.sh

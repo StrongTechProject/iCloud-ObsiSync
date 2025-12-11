@@ -4,7 +4,9 @@
 # Obsidian AutoSync 初始化配置脚本
 # ==========================================
 
-CONFIG_FILE="config.sh"
+# 脚本文件所在的目录 (src 目录)
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CONFIG_FILE="$SCRIPT_DIR/config.sh"
 DEFAULT_LOG_RETENTION=7
 
 echo "--------------------------------------------------"
@@ -62,9 +64,17 @@ while true; do
                 break
             else
                 echo "⚠️  警告: 目标路径存在，但似乎不是 Git 仓库 (未找到 .git)。"
-                read -p "   是否继续? (y/n): " confirm
-                if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
+                read -p "   是否初始化该目录为 Git 仓库? (y/n): " init_confirm
+                if [[ "$init_confirm" == "y" || "$init_confirm" == "Y" ]]; then
+                    echo "正在 $DEST_DIR 初始化 Git 仓库..."
+                    git -C "$DEST_DIR" init
+                    echo "✅ Git 仓库已成功初始化."
                     break
+                else
+                    read -p "   是否继续而不初始化? (y/n): " continue_confirm
+                    if [[ "$continue_confirm" == "y" || "$continue_confirm" == "Y" ]]; then
+                        break
+                    fi
                 fi
             fi
         else
