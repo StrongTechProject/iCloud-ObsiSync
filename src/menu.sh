@@ -52,11 +52,11 @@ do_check_status() {
         echo "📄 Inspecting log: $(basename "$LATEST_LOG")"
         echo "-----------------------------------"
         
-        if grep -q "✅ 成功: 已推送到 GitHub" "$LATEST_LOG"; then
+        if grep -q "✅ Success: pushed to GitHub" "$LATEST_LOG"; then
             echo "✅ Status: Sync succeeded (changes pushed)"
-        elif grep -q "☕ 无变动，跳过推送" "$LATEST_LOG"; then
+        elif grep -q "☕ No changes detected; skipping push" "$LATEST_LOG"; then
             echo "✅ Status: Sync succeeded (no changes)"
-        elif grep -q "❌ 错误" "$LATEST_LOG" || grep -q "❌ 致命错误" "$LATEST_LOG"; then
+        elif grep -q "❌ Error" "$LATEST_LOG" || grep -q "❌ Fatal error" "$LATEST_LOG"; then
             echo "❌ Status: Sync failed (see log for details)"
             echo "   Key error lines:"
             grep "❌" "$LATEST_LOG" | tail -n 3

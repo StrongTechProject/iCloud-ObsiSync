@@ -1,25 +1,25 @@
 #!/bin/bash
 
 # ==========================================
-# Obsidian AutoSync 初始化配置脚本
+# Obsidian AutoSync Setup Wizard
 # ==========================================
 
-# 脚本文件所在的目录 (src 目录)
+# Directory of this script (src directory)
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CONFIG_FILE="$SCRIPT_DIR/config.sh"
 DEFAULT_LOG_RETENTION=7
 
 echo "--------------------------------------------------"
-echo "👋 欢迎使用 Obsidian AutoSync 配置向导"
-echo "此脚本将生成 '$CONFIG_FILE' 配置文件。"
+echo "👋 Welcome to the Obsidian AutoSync setup wizard"
+echo "This script will generate '$CONFIG_FILE'."
 echo "--------------------------------------------------"
 
-# 0. 环境依赖检查
-echo "🔍 正在检查系统依赖..."
+# 0. Dependency check
+echo "🔍 Checking required commands..."
 MISSING_DEPS=0
 for cmd in git rsync; do
     if ! command -v $cmd &> /dev/null; then
-        echo "❌ 错误: 未找到命令 '$cmd'。请先安装它。"
+        echo "❌ Error: command '$cmd' not found. Please install it first."
         MISSING_DEPS=1
     else
         echo "✅ Found $cmd"
@@ -27,34 +27,34 @@ for cmd in git rsync; do
 done
 
 if [ $MISSING_DEPS -ne 0 ]; then
-    echo "⚠️  缺少必要依赖，脚本无法继续。请安装 git 和 rsync 后重试。"
+    echo "⚠️  Missing dependencies detected. Install git and rsync, then rerun this script."
     exit 1
 fi
 
-# 1. 获取 Obsidian 源路径
+# 1. Ask for Obsidian source path
 while true; do
     echo ""
-    echo "👉 请输入 Obsidian 运行目录/源目录路径 (Source):"
-    echo "   (通常是你的 Obsidian Vault 路径)"
-    echo "   (提示: 你可以直接将文件夹拖入此终端窗口)"
+    echo "👉 Please enter the Obsidian source directory:"
+    echo "   (usually your Obsidian Vault path)"
+    echo "   (tip: you can drag the folder into this terminal window)"
     read -e -p "Path: " SOURCE_DIR
-    # 去除可能存在的引号（macOS 拖拽可能会加引号）
+    # Strip quotes (macOS drag & drop may add them)
     SOURCE_DIR="${SOURCE_DIR%\"}"
     SOURCE_DIR="${SOURCE_DIR#\"}"
     
     if [ -d "$SOURCE_DIR" ]; then
-        echo "✅ 源路径有效."
+        echo "✅ Source path is valid."
         break
     else
-        echo "❌ 错误: 目录不存在，请重新输入。"
+        echo "❌ Error: directory does not exist. Try again."
     fi
 done
 
-# 2. 获取本地 Git 仓库路径
+# 2. Ask for local git repository path
 while true; do
     echo ""
-    echo "👉 请输入本地 Git 仓库目标路径 (Destination):"
-    echo "   (注意：如果你希望直接对源目录进行 Git 管理而不建立备份副本，请在此输入与上面相同的路径)"
+    echo "👉 Please enter the local git repository path (Destination):"
+    echo "   (enter the same path as above if you want to track the source directly)"
     read -e -p "Path: " DEST_DIR
     DEST_DIR="${DEST_DIR%\"}"
     DEST_DIR="${DEST_DIR#\"}"
@@ -63,18 +63,18 @@ while true; do
         if [ -w "$DEST_DIR" ]; then
             IS_GIT_REPO=0
             if [ -d "$DEST_DIR/.git" ]; then
-                echo "✅ 目标路径是一个有效的 Git 仓库."
+                echo "✅ Destination path contains a git repository."
                 IS_GIT_REPO=1
             else
-                echo "⚠️  警告: 目标路径存在，但似乎不是 Git 仓库 (未找到 .git)。"
-                read -p "   是否初始化该目录为 Git 仓库? (y/n): " init_confirm
+                echo "⚠️  Warning: destination exists but .git was not found."
+                read -p "   Initialize this directory as a git repo? (y/n): " init_confirm
                 if [[ "$init_confirm" == "y" || "$init_confirm" == "Y" ]]; then
-                    echo "正在 $DEST_DIR 初始化 Git 仓库..."
+                    echo "Initializing git repository in $DEST_DIR..."
                     git -C "$DEST_DIR" init
-                    echo "✅ Git 仓库已成功初始化."
+                    echo "✅ Git repository initialized."
                     IS_GIT_REPO=1
                 else
-                    read -p "   是否继续而不初始化? (y/n): " continue_confirm
+                    read -p "   Continue without initializing? (y/n): " continue_confirm
                     if [[ "$continue_confirm" == "y" || "$continue_confirm" == "Y" ]]; then
                         break
                     fi
@@ -82,93 +82,93 @@ while true; do
             fi
 
             if [ $IS_GIT_REPO -eq 1 ]; then
-                # 检查远程仓库配置
+                # Ensure remote origin exists
                 if ! git -C "$DEST_DIR" remote get-url origin &>/dev/null; then
-                    echo "⚠️  警告: 未检测到远程仓库配置 (remote 'origin')。"
-                    read -p "   是否需要配置远程仓库地址? (y/n): " remote_confirm
+                    echo "⚠️  Warning: remote 'origin' is not configured."
+                    read -p "   Would you like to configure a remote now? (y/n): " remote_confirm
                     if [[ "$remote_confirm" == "y" || "$remote_confirm" == "Y" ]]; then
                         while true; do
-                            read -e -p "   请输入远程仓库 URL (例如 git@github.com:user/repo.git): " REMOTE_URL
+                            read -e -p "   Enter remote URL (e.g. git@github.com:user/repo.git): " REMOTE_URL
                             if [[ -n "$REMOTE_URL" ]]; then
-                                # 检查 remote 'origin' 是否已存在
+                                # Update remote origin if it exists already
                                 if git -C "$DEST_DIR" remote | grep -q '^origin$'; then
-                                    echo "   检测到已存在的 remote 'origin'，将更新其 URL..."
+                                    echo "   Remote 'origin' exists; updating URL..."
                                     git -C "$DEST_DIR" remote set-url origin "$REMOTE_URL"
                                 else
                                     git -C "$DEST_DIR" remote add origin "$REMOTE_URL"
                                 fi
 
-                                # 通过回读 URL 来验证操作是否真的成功
+                                # Verify the result matches what we just set
                                 if [[ "$(git -C "$DEST_DIR" remote get-url origin)" == "$REMOTE_URL" ]]; then
-                                    echo "✅ 远程仓库 'origin' 已成功配置."
-                                    # 尝试将当前分支重命名为 main (现代 Git 仓库的推荐做法)
+                                    echo "✅ Remote 'origin' configured."
+                                    # Normalize branch name to main
                                     git -C "$DEST_DIR" branch -M main
                                     break
                                 else
-                                    echo "❌ 远程仓库配置失败，请检查 URL 或权限后重试。"
+                                    echo "❌ Failed to configure remote. Check the URL or permissions."
                                 fi
                             else
-                                echo "❌ URL 不能为空。"
+                                echo "❌ URL cannot be empty."
                             fi
                         done
                     else
-                        echo "⚠️  已跳过远程配置。请稍后手动运行 'git remote add origin <url>'。"
+                        echo "⚠️  Remote configuration skipped. You can run 'git remote add origin <url>' later."
                     fi
                 else
                     EXISTING_URL=$(git -C "$DEST_DIR" remote get-url origin)
-                    echo "✅ 已检测到远程仓库: $EXISTING_URL"
+                    echo "✅ Remote detected: $EXISTING_URL"
                 fi
                 break
             fi
         else
-             echo "❌ 错误: 对目标路径没有写入权限，请检查权限设置。"
+             echo "❌ Error: no write permission to destination. Check file permissions."
         fi
     else
-        echo "❌ 错误: 目录不存在，请先创建该目录或重新输入。"
+        echo "❌ Error: directory does not exist. Create it first or enter a different path."
     fi
 done
 
-# 3. 设置日志目录
+# 3. Configure log directory
 echo ""
-echo "👉 请输入日志存放目录 (留空则默认为 ./logs):"
+echo "👉 Enter log directory (leave blank for ./logs):"
 read -e -p "Path: " LOG_DIR
 if [ -z "$LOG_DIR" ]; then
     LOG_DIR="./logs"
 fi
 
-# 创建并转换为绝对路径 (这对 Cron 运行至关重要)
+# Make sure Cron gets an absolute path
 mkdir -p "$LOG_DIR"
-# 使用 cd && pwd 获取绝对路径，兼容性好
+# Convert to absolute using cd && pwd for portability
 LOG_DIR=$(cd "$LOG_DIR" && pwd)
-echo "✅ 日志目录已准备 (绝对路径): $LOG_DIR"
+echo "✅ Log directory ready (absolute path): $LOG_DIR"
 
-# 4. SSH Key 自动配置
+# 4. SSH key auto-detection
 echo ""
-echo "👉 正在自动查找 SSH 私钥..."
+echo "👉 Searching for existing SSH private keys..."
 
-# 在默认位置查找潜在的 SSH 密钥
+# Look for SSH keys in the default location
 ssh_keys=()
-# 使用循环以获得比 mapfile 更好的可移植性
+# Loop to preserve portability vs. mapfile
 while IFS= read -r line; do
     ssh_keys+=("$line")
 done < <(find "$HOME/.ssh" -maxdepth 1 -type f -name "id_*" ! -name "*.pub" 2>/dev/null)
 
 SSH_KEY_PATH=""
 
-# 情况 1：找到密钥
+# Case 1: keys found
 if [ ${#ssh_keys[@]} -gt 0 ]; then
-    echo "✅ 发现了以下 SSH 私钥:"
-    options=("${ssh_keys[@]}" "手动输入其他路径" "生成一个新的密钥")
+    echo "✅ Detected the following SSH private keys:"
+    options=("${ssh_keys[@]}" "Enter another path manually" "Generate a new key")
     
-    # PS3 是 `select` 的提示符
-    PS3="请选择一个选项: "
+    # PS3 controls the select prompt
+    PS3="Pick an option: "
     select choice in "${options[@]}"; do
         case "$choice" in
-            "手动输入其他路径")
-                read -e -p "请输入 SSH 私钥路径: " SSH_KEY_PATH
+            "Enter another path manually")
+                read -e -p "Enter SSH private key path: " SSH_KEY_PATH
                 break
                 ;;
-            "生成一个新的密钥")
+            "Generate a new key")
                 SSH_KEY_PATH="generate_new"
                 break
                 ;;
@@ -177,92 +177,92 @@ if [ ${#ssh_keys[@]} -gt 0 ]; then
                     SSH_KEY_PATH="$choice"
                     break
                 else
-                    echo "❌ 无效选项，请输入选项对应的数字。"
+                    echo "❌ Invalid selection. Choose a valid number."
                 fi
                 ;;
         esac
     done
     PS3="" # Reset prompt
 else
-    # 情况 2：未找到密钥
-    echo "🤔 未在默认位置 (~/.ssh/) 找到 SSH 私钥。"
-    read -p "是否需要为您生成一个新的 SSH 密钥? (y/n): " generate_confirm
+    # Case 2: no key discovered
+    echo "🤔 No SSH private keys found in ~/.ssh."
+    read -p "Create a new SSH key now? (y/n): " generate_confirm
     if [[ "$generate_confirm" == "y" || "$generate_confirm" == "Y" ]]; then
         SSH_KEY_PATH="generate_new"
     else
-        echo "⚠️  警告: 未选择 SSH 密钥。"
-        read -e -p "您仍然可以手动输入一个路径 (留空则跳过): " SSH_KEY_PATH
+        echo "⚠️  Warning: no SSH key selected."
+        read -e -p "You can still enter a path manually (leave blank to skip): " SSH_KEY_PATH
     fi
 fi
 
-# 密钥生成逻辑
+# Optional key generation
 if [[ "$SSH_KEY_PATH" == "generate_new" ]]; then
-    echo "⚙️  开始生成新的 SSH 密钥..."
-    # 为新密钥请求邮箱地址
+    echo "⚙️  Generating a new SSH key..."
+    # Ask for email to embed as a comment
     user_email=""
     while [ -z "$user_email" ]; do
-        read -p "请输入您的邮箱地址 (用于密钥注释): " user_email
+        read -p "Enter your email (for the key comment): " user_email
     done
     
-    # 建议一个唯一的名称以避免覆盖现有密钥
+    # Suggest a unique path to avoid overwriting existing keys
     NEW_KEY_PATH="$HOME/.ssh/id_ed25519_obsidian_sync"
     
-    # 检查文件是否已存在
+    # Guard against overwriting an existing file
     if [ -f "$NEW_KEY_PATH" ]; then
-        echo "⚠️  警告: 文件 '$NEW_KEY_PATH' 已存在。"
-        read -p "   是否覆盖? (y/n): " overwrite_confirm
+        echo "⚠️  Warning: file '$NEW_KEY_PATH' already exists."
+        read -p "   Overwrite it? (y/n): " overwrite_confirm
         if [[ "$overwrite_confirm" != "y" && "$overwrite_confirm" != "Y" ]]; then
-            echo "   操作取消。"
-            SSH_KEY_PATH="" # 重置路径
+            echo "   Cancelled."
+            SSH_KEY_PATH="" # reset so we do not continue
         fi
     fi
     
-    # 如果路径仍然设置，则继续生成
+    # Continue only if the sentinel is still set
     if [[ "$SSH_KEY_PATH" == "generate_new" ]]; then
-        echo "   正在生成 ED25519 密钥..."
-        # 非交互式生成 ED25519 密钥
+        echo "   Creating ED25519 key..."
+        # Non-interactive ED25519 generation
         ssh-keygen -t ed25519 -C "$user_email" -f "$NEW_KEY_PATH" -N ""
         
         if [ -f "$NEW_KEY_PATH" ]; then
-            echo "✅ 新的 SSH 密钥已成功生成于: $NEW_KEY_PATH"
+            echo "✅ New SSH key generated at: $NEW_KEY_PATH"
             SSH_KEY_PATH="$NEW_KEY_PATH"
         else
-            echo "❌ 错误: 密钥生成失败。"
-            SSH_KEY_PATH="" # 重置路径以避免问题
+            echo "❌ Error: key generation failed."
+            SSH_KEY_PATH="" # reset because creation failed
         fi
     fi
 fi
 
-# 对用户的最终检查和显示公钥
+# Final reminder to add the key to GitHub
 if [ -n "$SSH_KEY_PATH" ] && [ -f "$SSH_KEY_PATH" ]; then
-    echo "✅ 已选择此 SSH 私钥: $SSH_KEY_PATH"
+    echo "✅ Using SSH private key: $SSH_KEY_PATH"
     PUBLIC_KEY_PATH="${SSH_KEY_PATH}.pub"
     if [ -f "$PUBLIC_KEY_PATH" ]; then
         echo ""
         echo "--------------------------------------------------"
-        echo "🔴 重要操作: 请将以下公钥内容添加到您的 GitHub 账户!"
-        echo "   1. 访问: https://github.com/settings/keys"
-        echo "   2. 点击 'New SSH key'"
-        echo "   3. 将下面的内容完整粘贴到 'Key' 字段中:"
+        echo "🔴 Important: add the following public key to your GitHub account."
+        echo "   1. Visit https://github.com/settings/keys"
+        echo "   2. Click 'New SSH key'"
+        echo "   3. Paste the content below into the Key field:"
         echo "-------------------[ PUBLIC KEY START ]-------------------"
         cat "$PUBLIC_KEY_PATH"
         echo "--------------------[ PUBLIC KEY END ]--------------------"
         echo ""
-        read -n 1 -s -r -p "完成 GitHub 添加操作后，按任意键继续..."
+        read -n 1 -s -r -p "Press any key once you finish adding the key to GitHub..."
     fi
 elif [ -n "$SSH_KEY_PATH" ]; then
-    # 用户输入的路径不存在或生成失败的情况
-    echo "⚠️  警告: 指定的路径 '$SSH_KEY_PATH' 不是一个有效的文件。"
+    # Provided path does not exist or keygen failed
+    echo "⚠️  Warning: '$SSH_KEY_PATH' is not a valid file."
 fi
 
-# 如果 SSH_KEY_PATH 仍然为空，通知用户。
+# Notify user when key path is empty
 if [ -z "$SSH_KEY_PATH" ]; then
-    echo "⚠️  警告: 未配置 SSH 密钥路径。脚本将继续，但 Git 推送可能会失败或要求密码。"
+    echo "⚠️  Warning: SSH key path is empty. Git pushes may fail or prompt for a password."
 fi
 
-# 5. 生成配置文件
+# 5. Generate config file
 echo ""
-echo "正在生成 $CONFIG_FILE ..."
+echo "Generating $CONFIG_FILE ..."
 
 cat > "$CONFIG_FILE" <<EOF
 # Obsidian AutoSync Configuration
@@ -275,20 +275,20 @@ SSH_KEY_PATH="$SSH_KEY_PATH"
 LOG_RETENTION_DAYS=$DEFAULT_LOG_RETENTION
 EOF
 
-# 6. 配置自动同步频率 (Crontab)
+# 6. Configure autosync schedule (crontab)
 echo ""
 echo "--------------------------------------------------"
-echo "⏱️  配置自动同步频率"
-echo "您可以现在设置自动同步任务，或者稍后在菜单中配置。"
+echo "⏱️  Configure auto-sync frequency"
+echo "You can schedule it now or configure later from the menu."
 echo "--------------------------------------------------"
 
-echo "请选择预设频率:"
-echo "  1. 每 15 分钟 (推荐)"
-echo "  2. 每小时"
-echo "  3. 每天 (凌晨 2:00)"
-echo "  4. 暂不设置 (手动运行)"
+echo "Choose a preset:"
+echo "  1. Every 15 minutes (recommended)"
+echo "  2. Hourly"
+echo "  3. Daily (02:00)"
+echo "  4. Skip for now (manual only)"
 
-read -p "请选择 [1-4]: " cron_choice
+read -p "Select [1-4]: " cron_choice
 
 SYNC_SCRIPT="$SCRIPT_DIR/sync_and_push.sh"
 NEW_CRON_SCHEDULE=""
@@ -298,36 +298,36 @@ case "$cron_choice" in
     2) NEW_CRON_SCHEDULE="0 * * * *";;
     3) NEW_CRON_SCHEDULE="0 2 * * *";;
     4) NEW_CRON_SCHEDULE="";;
-    *) echo "   无效选项，默认不设置。"; NEW_CRON_SCHEDULE="";;
+    *) echo "   Invalid selection; skipping schedule."; NEW_CRON_SCHEDULE="";;
 esac
 
 if [ -n "$NEW_CRON_SCHEDULE" ]; then
-    echo "   正在配置 Crontab..."
+    echo "   Updating crontab..."
     
-    # 使用 mktemp 创建安全的临时文件
+    # Create a temporary file safely
     CRON_TMP_FILE=$(mktemp)
 
-    # 从当前 crontab 中移除旧任务（如果有），并将结果存入临时文件
-    # 使用 grep -F 确保精确匹配路径字符串
+    # Remove old entries for this script
+    # Use grep -F to ensure literal matching
     crontab -l 2>/dev/null | grep -v -F "$SYNC_SCRIPT" > "$CRON_TMP_FILE"
 
-    # 添加新任务
+    # Append the new job
     echo "$NEW_CRON_SCHEDULE $SYNC_SCRIPT" >> "$CRON_TMP_FILE"
 
-    # 应用新 Crontab
+    # Apply new crontab
     if crontab "$CRON_TMP_FILE"; then
-        echo "✅ 自动同步任务已启用: $NEW_CRON_SCHEDULE"
+        echo "✅ Auto-sync enabled: $NEW_CRON_SCHEDULE"
     else
-        echo "❌ Crontab 更新失败。"
+        echo "❌ Failed to update crontab."
     fi
     
     rm "$CRON_TMP_FILE"
 else
-    echo "   已跳过自动同步设置。"
+    echo "   Auto-sync setup skipped."
 fi
 
 echo "--------------------------------------------------"
-echo "🎉 配置完成！"
-echo "请确保你的主脚本 (sync_and_push.sh) 包含以下代码来加载配置："
+echo "🎉 Setup complete!"
+echo "Make sure your main script (sync_and_push.sh) loads the config with:"
 echo "source \"\$(dirname \"\$0\")/config.sh\""
 echo "--------------------------------------------------"
