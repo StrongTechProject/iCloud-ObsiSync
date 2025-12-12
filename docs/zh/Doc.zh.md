@@ -1,10 +1,10 @@
-# 📚 Obsidian-Timemachine 自动同步流程文档
+#  Obsidian-Timemachine 自动同步流程文档
 
 ## 1. 流程概述
 
 本流程旨在将存储在 **iCloud Drive 或任意本地目录** 中的 Obsidian Vault 笔记库自动同步（镜像备份）到本地指定目录，并利用 **Git** 工具将所有变动提交（Commit）并推送到 **GitHub** 远程仓库，实现 Obsidian 笔记的自动化版本管理和异地备份。
 
-### ✨ 主要功能
+###  主要功能
 - **一键安装**: 提供 `install.sh` 脚本，自动克隆并启动配置向导。
 - **自动配置向导**: 提供 `setup.sh` 脚本，交互式完成环境配置。
 - **安全配置分离**: 配置文件 `config.sh` 包含敏感路径，默认被 Git 忽略，防止泄露。

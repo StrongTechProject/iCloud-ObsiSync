@@ -1,10 +1,10 @@
-# 📚 Obsidian-Timemachine Documentation
+#  Obsidian-Timemachine Documentation
 
 ## 1. Overview
 
 This workflow is designed to automatically sync (mirror backup) an Obsidian Vault stored in **iCloud Drive or any local directory** to a specified local directory, and use **Git** to commit and push all changes to a remote **GitHub** repository. This achieves automated version control and off-site backup for your Obsidian notes.
 
-### ✨ Key Features
+###  Key Features
 - **One-Click Install**: Provides an `install.sh` script to clone the repo and start the setup wizard.
 - **Auto-Config Wizard**: Provides a `setup.sh` script to interactively configure the environment.
 - **Secure Configuration**: The `config.sh` file containing sensitive paths is separated and ignored by Git by default.

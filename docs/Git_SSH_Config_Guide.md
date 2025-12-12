@@ -1,6 +1,6 @@
 # GitHub SSH Key Configuration Guide (Beginner Friendly)
 
-## 👋 Introduction
+##  Introduction
 If you are new to Git or GitHub, you might be unfamiliar with "SSH Keys". In simple terms, **an SSH Key is like your "Digital ID card"**.
 
 - **Why do you need it?**
@@ -12,7 +12,7 @@ If you are new to Git or GitHub, you might be unfamiliar with "SSH Keys". In sim
 
 ---
 
-## 🛠 Step 1: Check for Existing Keys
+##  Step 1: Check for Existing Keys
 
 Before generating a new key, let's check if you already have one.
 
@@ -29,7 +29,7 @@ Before generating a new key, let's check if you already have one.
 
 ---
 
-## 🔑 Step 2: Generate a New SSH Key
+##  Step 2: Generate a New SSH Key
 
 We will create a new, secure key.
 
@@ -44,20 +44,20 @@ We will create a new, secure key.
     ```text
     Enter file in which to save the key (/Users/your_name/.ssh/id_ed25519):
     ```
-    👉 **Just press Enter** (to use the default path).
+     **Just press Enter** (to use the default path).
 
 4.  **System will ask for a Passphrase**:
     ```text
     Enter passphrase (empty for no passphrase):
     ```
-    👉 **Recommended**: For **fully automated backups** (so you don't have to type a password every time), please **just press Enter** (leave it empty).
+     **Recommended**: For **fully automated backups** (so you don't have to type a password every time), please **just press Enter** (leave it empty).
     - *Note: Press Enter again when asked to confirm.*
 
 5.  Upon success, you will see a message like `Your identification has been saved in...` and a randomart image.
 
 ---
 
-## 📋 Step 3: Copy the Public Key
+##  Step 3: Copy the Public Key
 
 Now we need to copy the content of the "Public Key" to give it to GitHub.
 
@@ -73,7 +73,7 @@ Now we need to copy the content of the "Public Key" to give it to GitHub.
 
 ---
 
-## 🌐 Step 4: Add to GitHub
+##  Step 4: Add to GitHub
 
 1.  Open your browser and log in to [GitHub](https://github.com/).
 2.  Click your **Avatar** in the top-right corner -> Select **Settings**.
@@ -87,7 +87,7 @@ Now we need to copy the content of the "Public Key" to give it to GitHub.
 
 ---
 
-## ✅ Step 5: Test Connection
+##  Step 5: Test Connection
 
 Finally, let's verify if the configuration is successful.
 
@@ -102,11 +102,11 @@ Finally, let's verify if the configuration is successful.
     The authenticity of host 'github.com ...' can't be established.
     Are you sure you want to continue connecting (yes/no/[fingerprint])?
     ```
-    👉 **Type `yes` and press Enter.**
+     **Type `yes` and press Enter.**
 
 3.  If successful, you should see a welcome message:
     ```text
     Hi <your_username>! You've successfully authenticated, but GitHub does not provide shell access.
     ```
 
-🎉 **Congratulations! You have successfully configured your SSH Key.** Now you can use the automation scripts in this project to sync your Obsidian notes.
+ **Congratulations! You have successfully configured your SSH Key.** Now you can use the automation scripts in this project to sync your Obsidian notes.

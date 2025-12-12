@@ -1,4 +1,4 @@
-# Obsidian-Timemachine ⏳
+# Obsidian-Timemachine 
 
 [中文文档](README.zh.md) | [Documentation](docs/Doc.md)
 
@@ -6,18 +6,18 @@
 
 Unlike internal plugins, **Obsidian-Timemachine** runs as a system-level background process. It automatically syncs your vault (from iCloud Drive or any local path) to a Git repository and pushes changes to GitHub, ensuring your data is safe even if you never open Obsidian.
 
-## 🚀 Why Obsidian-Timemachine?
+##  Why Obsidian-Timemachine?
 
 While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers distinct advantages for data safety:
 
-| Feature | 🔌 Obsidian Plugins | 🛡️ Obsidian-Timemachine |
+| Feature |  Obsidian Plugins | ️ Obsidian-Timemachine |
 | :--- | :--- | :--- |
 | **Dependency** | **Must open Obsidian** to trigger backup. | **Zero dependency.** Runs in background (cron) even if Obsidian is closed. |
 | **Performance** | Uses JS-based Git (slower for large vaults). | Uses **Native Git & Rsync** (fast, efficient, stable). |
 | **Safety** | Direct Git ops in sync folders (risk of conflicts). | **Separation mode**: Mirrors source to a clean Git repo via Rsync. |
 | **Philosophy** | "Version Control Tool" | **"Automated Disaster Recovery"** |
 
-## ✨ Features
+##  Features
 
 - **Background Automation**: Runs silently via Cron. You focus on writing; we handle the saving.
 - **Dual Modes**:
@@ -26,7 +26,7 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 - **Secure**: Sensitive configuration (paths, SSH keys) is completely separated from the code.
 - **Smart Logging**: Auto-rotates logs and keeps your system clean.
 
-## 📥 Installation
+##  Installation
 
 **One-click Installation:**
 ```bash
@@ -35,7 +35,7 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 
 After installation, type `obsis` in your terminal to launch the **Time Machine Control Panel**.
 
-## 🛠 Quick Start
+##  Quick Start
 
 1.  **Setup Wizard**:
     Run `obsis` and select **Option 1 (Quick Start)**.
