@@ -1,4 +1,4 @@
-# 📚 iCloud-ObsiSync 自动同步流程文档
+# 📚 Obsidian-Timemachine 自动同步流程文档
 
 ## 1. 流程概述
 
@@ -19,7 +19,7 @@
 
 **推荐使用一键安装脚本：**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/Obsidian-Timemachine/main/src/install.sh)"
 ```
 该脚本会自动克隆仓库、配置环境，并尝试创建全局快捷指令 `obsis`。
 
@@ -82,7 +82,7 @@ obsis
 
 2. 添加定时任务 (示例：每 20 分钟执行一次)：
    ```cron
-   */20 * * * * /path/to/iCloud-ObsiSync/src/sync_and_push.sh
+   */20 * * * * /path/to/Obsidian-Timemachine/src/sync_and_push.sh
    ```
    *> 注意：请确保填写脚本的**绝对路径**。*
 

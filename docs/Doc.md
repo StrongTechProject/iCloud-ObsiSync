@@ -1,4 +1,4 @@
-# 📚 iCloud-ObsiSync Documentation
+# 📚 Obsidian-Timemachine Documentation
 
 ## 1. Overview
 
@@ -19,7 +19,7 @@ This workflow is designed to automatically sync (mirror backup) an Obsidian Vaul
 
 **Recommended: One-Click Installation**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/Obsidian-Timemachine/main/src/install.sh)"
 ```
 This script will automatically clone the repository, set up the environment, and attempt to create a global shortcut command `obsis`.
 
@@ -83,7 +83,7 @@ If you prefer manual management, you can edit `crontab -e`:
 
 2. Add a scheduled task (Example: Run every 20 minutes):
    ```cron
-   */20 * * * * /path/to/iCloud-ObsiSync/src/sync_and_push.sh
+   */20 * * * * /path/to/Obsidian-Timemachine/src/sync_and_push.sh
    ```
    *> Note: Ensure you use the **absolute path** to the script.*
 

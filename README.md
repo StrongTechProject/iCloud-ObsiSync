@@ -30,7 +30,7 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 
 **One-click Installation:**
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/iCloud-ObsiSync/main/src/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/Obsidian-Timemachine/main/src/install.sh)"
 ```
 *(Note: The repository URL will be updated once you rename the GitHub repo, currently pointing to the existing path)*
 

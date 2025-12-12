@@ -8,7 +8,7 @@ set -e
 
 # ⚠️ TODO: 请将此处修改为你的 GitHub 用户名
 GITHUB_USER="StrongTechProject"
-REPO_NAME="iCloud-ObsiSync"
+REPO_NAME="Obsidian-Timemachine"
 REPO_URL="https://github.com/${GITHUB_USER}/${REPO_NAME}.git"
 
 # 智能判断安装目录
