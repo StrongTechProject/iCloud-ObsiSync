@@ -4,19 +4,22 @@
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 CONFIG_FILE="$SCRIPT_DIR/config.sh"
 
+# Ensure Cron environment can find Homebrew installed tools (git, rsync)
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:$PATH"
+
 # ================= Configuration =================
 
-# 1. Defaults (used when config.sh is missing)
-SOURCE_DIR="/Users/your_username/Library/Mobile Documents/iCloud~md~obsidian/Documents/your_vault"
-DEST_DIR="/path/to/your/local/backup/folder"
-LOG_DIR="$SCRIPT_DIR/logs"
-SSH_KEY_PATH="/path/to/your/private/ssh_key"
-LOG_RETENTION_DAYS=7
-
-# 2. Load config file (when available)
+# 1. Load config file
 if [ -f "$CONFIG_FILE" ]; then
     # shellcheck source=config.sh
     source "$CONFIG_FILE"
+else
+    # Config file missing is a critical error
+    echo "❌ Fatal error: Config file not found at $CONFIG_FILE"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        osascript -e "display notification \"Config file missing. Please re-run setup.\" with title \"Obsidian Backup Failed\" sound name \"Basso\""
+    fi
+    exit 1
 fi
 
 # 3. Global Git SSH configuration so every git command uses the provided key
@@ -80,6 +83,7 @@ git pull origin "$CURRENT_BRANCH" >> "$LOG_FILE" 2>&1
 
 if [ $? -ne 0 ]; then
     log "⚠️ Warning: git pull failed. Could be networking or conflicts. Proceeding with rsync anyway..."
+    notify_error "Git pull failed. Check for conflicts."
     # Continue because the local rsync needs to run even when pull fails
 else
     log "✅ Git pull completed."
