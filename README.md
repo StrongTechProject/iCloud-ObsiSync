@@ -32,7 +32,6 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/Obsidian-Timemachine/main/src/install.sh)"
 ```
-*(Note: The repository URL will be updated once you rename the GitHub repo, currently pointing to the existing path)*
 
 After installation, type `obsis` in your terminal to launch the **Time Machine Control Panel**.
 

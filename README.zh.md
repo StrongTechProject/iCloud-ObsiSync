@@ -32,7 +32,6 @@
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/StrongTechProject/Obsidian-Timemachine/main/src/install.sh)"
 ```
-*(注意：仓库链接指向当前地址，后续重命名仓库后请使用新链接)*
 
 安装完成后，在终端输入 `obsis` 即可启动 **时光机控制台**。
 
