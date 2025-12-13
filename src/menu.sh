@@ -188,9 +188,31 @@ do_view_logs() {
         echo "📭 No logs found in directory."
     else
         echo "Opening latest log: $LATEST_LOG"
-        echo "Press Ctrl+C to exit"
         echo "-----------------------------------"
-        tail -f "$LATEST_LOG"
+        echo "Press 'q' to quit real-time view and return to menu."
+
+        while true; do
+            clear
+            echo "📄 Real-time Log: $(basename "$LATEST_LOG")"
+            echo "-----------------------------------"
+            # Display last 20 lines. Adjust if more or less context is needed.
+            tail -n 20 "$LATEST_LOG" 2>/dev/null || echo "Log file is empty or unreadable."
+            echo "-----------------------------------"
+            echo "Press 'q' to quit, or wait for auto-refresh..."
+
+            # Read with a timeout (e.g., 2 seconds)
+            # -t 2: timeout after 2 seconds
+            # -n 1: read 1 character
+            # -s: silent mode (do not echo input)
+            # -r: raw input (do not interpret backslash escapes)
+            read -t 2 -n 1 -s -r -p "" KEY_PRESSED
+
+            if [[ "$KEY_PRESSED" == "q" ]]; then
+                break # Exit the loop
+            fi
+        done
+        echo "Exited log viewer."
+
     fi
 }
 
@@ -258,7 +280,7 @@ while true; do
             ;;
     esac
     
-    if [[ "$choice" =~ ^[1235]$ ]]; then
+    if [[ "$choice" =~ ^[12345]$ ]]; then
         echo ""
         read -n 1 -s -r -p "Press any key to return to the menu..."
     fi
