@@ -30,14 +30,14 @@
 
 ```mermaid
 graph LR
-    User([用户]) -->|1. 编辑| Vault[📂 Obsidian 笔记库\n(工作目录)]
+    User([用户]) -->|1. 编辑| Vault["📂 Obsidian 笔记库\n(工作目录)"]
     
     subgraph "Obsidian Timemachine"
         direction TB
         Service[⚙️ 自动化服务]
     end
     
-    Vault -->|2. 同步| Repo[📦 Git 仓库\n(版本控制目录)]
+    Vault -->|2. 同步| Repo["📦 Git 仓库\n(版本控制目录)"]
     Service -- 管理生命周期 --> Repo
     
     Repo -->|3. 推送| Remote[☁️ GitHub 远程仓库]

@@ -30,14 +30,14 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 
 ```mermaid
 graph LR
-    User([User]) -->|1. Edits| Vault[📂 Obsidian Vault\n(Working Directory)]
+    User([User]) -->|1. Edits| Vault["📂 Obsidian Vault\n(Working Directory)"]
     
     subgraph "Obsidian Timemachine"
         direction TB
         Service[⚙️ Automation Service]
     end
     
-    Vault -->|2. Sync| Repo[📦 Git Repository\n(Version Control Dir)]
+    Vault -->|2. Sync| Repo["📦 Git Repository\n(Version Control Dir)"]
     Service -- Manages Lifecycle --> Repo
     
     Repo -->|3. Push| Remote[☁️ GitHub]
