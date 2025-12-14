@@ -29,20 +29,18 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 ## Architecture
 
 ```mermaid
-graph TD
-    User([User]) -->|Writes/Edits| Vault[📂 Obsidian Vault]
+graph LR
+    User([User]) -->|1. Edits| Vault[📂 Obsidian Vault\n(Working Directory)]
     
     subgraph "Obsidian Timemachine"
         direction TB
-        Menu[🖥️ menu.sh] -->|Manually triggers| Script
-        Cron[⏰ Crontab] -->|Automatically triggers| Script
-        Script[⚙️ sync_and_push.sh]
-        Config[📝 config.sh] -.-> Script
-        Script -->|Writes| Logs[📄 Logs]
+        Service[⚙️ Automation Service]
     end
     
-    Vault <-->|Git Operations| Script
-    Script <-->|Push/Pull| Remote[☁️ Remote Git Repository]
+    Vault -->|2. Sync| Repo[📦 Git Repository\n(Version Control Dir)]
+    Service -- Manages Lifecycle --> Repo
+    
+    Repo -->|3. Push| Remote[☁️ GitHub]
 ```
 
 ##  Installation

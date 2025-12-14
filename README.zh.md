@@ -29,20 +29,18 @@
 ## 工作流程
 
 ```mermaid
-graph TD
-    User([用户]) -->|写作/编辑| Vault[📂 Obsidian 笔记库]
+graph LR
+    User([用户]) -->|1. 编辑| Vault[📂 Obsidian 笔记库\n(工作目录)]
     
     subgraph "Obsidian Timemachine"
         direction TB
-        Menu[🖥️ menu.sh (菜单)] -->|手动触发| Script
-        Cron[⏰ Crontab (定时任务)] -->|自动触发| Script
-        Script[⚙️ sync_and_push.sh (核心脚本)]
-        Config[📝 config.sh (配置)] -.-> Script
-        Script -->|记录| Logs[📄 日志]
+        Service[⚙️ 自动化服务]
     end
     
-    Vault <-->|Git 操作| Script
-    Script <-->|Push/Pull| Remote[☁️ 远程 Git 仓库]
+    Vault -->|2. 同步| Repo[📦 Git 仓库\n(版本控制目录)]
+    Service -- 管理生命周期 --> Repo
+    
+    Repo -->|3. 推送| Remote[☁️ GitHub 远程仓库]
 ```
 
 ##  安装
