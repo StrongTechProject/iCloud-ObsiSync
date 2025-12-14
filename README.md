@@ -55,14 +55,15 @@ After installation, type `obsis` in your terminal to launch the **Time Machine C
 
 ##  Quick Start
 
-1.  **Setup Wizard**:
-    Run `obsis` and select **Option 1 (Quick Start)**.
-    *   **Source**: Your Obsidian Vault path.
-    *   **Destination**: Where you want the Git repository (can be the same as Source for Direct Mode).
-    *   **SSH Key**: Auto-detects or generates a secure key for GitHub.
+1.  **Setup Wizard (Full Initialization)**:
+    Run `obsis` and select **Option 1 (Quick Start)**. This guided wizard will:
+    *   Prompt for your **Obsidian Vault Path (Source)**.
+    *   Define the **Git Repository Path (Destination)**.
+    *   Configure your **SSH Key** for GitHub (auto-detects or generates).
+    *   Help you **set the auto-sync frequency (the "Time Machine" part)**, making it truly "set and forget".
 
-2.  **Schedule (The "Time Machine" part)**:
-    Use **Option 3** in the menu to set a frequency (e.g., every 15 mins). Once set, you can forget about it.
+2.  **Modify Existing Configuration**:
+    If you need to change previously set options (like sync frequency or paths), use **Option 3 (Configure options)** from the main menu.
 
 3.  **Manual Run**:
     ```bash
