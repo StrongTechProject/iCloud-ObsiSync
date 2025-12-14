@@ -26,6 +26,25 @@
 - **安全隐私**: 敏感配置（路径、SSH Key）与代码完全分离。
 - **智能日志**: 自动轮转日志，清晰记录每一次“时光快照”。
 
+## 工作流程
+
+```mermaid
+graph TD
+    User([用户]) -->|写作/编辑| Vault[📂 Obsidian 笔记库]
+    
+    subgraph "Obsidian Timemachine"
+        direction TB
+        Menu[🖥️ menu.sh (菜单)] -->|手动触发| Script
+        Cron[⏰ Crontab (定时任务)] -->|自动触发| Script
+        Script[⚙️ sync_and_push.sh (核心脚本)]
+        Config[📝 config.sh (配置)] -.-> Script
+        Script -->|记录| Logs[📄 日志]
+    end
+    
+    Vault <-->|Git 操作| Script
+    Script <-->|Push/Pull| Remote[☁️ 远程 Git 仓库]
+```
+
 ##  安装
 
 **一键安装命令:**

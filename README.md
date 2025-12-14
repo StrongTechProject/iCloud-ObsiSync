@@ -26,6 +26,25 @@ While plugins like *obsidian-git* are great, **Obsidian-Timemachine** offers dis
 - **Secure**: Sensitive configuration (paths, SSH keys) is completely separated from the code.
 - **Smart Logging**: Auto-rotates logs and keeps your system clean.
 
+## Architecture
+
+```mermaid
+graph TD
+    User([User]) -->|Writes/Edits| Vault[📂 Obsidian Vault]
+    
+    subgraph "Obsidian Timemachine"
+        direction TB
+        Menu[🖥️ menu.sh] -->|Manually triggers| Script
+        Cron[⏰ Crontab] -->|Automatically triggers| Script
+        Script[⚙️ sync_and_push.sh]
+        Config[📝 config.sh] -.-> Script
+        Script -->|Writes| Logs[📄 Logs]
+    end
+    
+    Vault <-->|Git Operations| Script
+    Script <-->|Push/Pull| Remote[☁️ Remote Git Repository]
+```
+
 ##  Installation
 
 **One-click Installation:**
