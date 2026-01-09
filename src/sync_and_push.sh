@@ -100,9 +100,14 @@ if [[ "$REAL_SOURCE" == "$REAL_DEST" ]]; then
 else
     log "📂 Starting rsync sync..."
     rsync -av --delete --exclude '.git' --exclude '.DS_Store' "$SOURCE_DIR/" "$DEST_DIR/" >> "$LOG_FILE" 2>&1
+    RSYNC_EXIT=$?
 
-    if [ $? -ne 0 ]; then
-        log "❌ Error: rsync sync failed (exit code $?)."
+    if [ $RSYNC_EXIT -eq 0 ]; then
+        log "✅ Rsync completed successfully."
+    elif [ $RSYNC_EXIT -eq 23 ] || [ $RSYNC_EXIT -eq 24 ]; then
+        log "⚠️ Warning: rsync reported issues (code $RSYNC_EXIT). Some files might be truncated or vanished. Proceeding..."
+    else
+        log "❌ Error: rsync sync failed (exit code $RSYNC_EXIT)."
         notify_error "Rsync file sync failed"
         exit 1
     fi
