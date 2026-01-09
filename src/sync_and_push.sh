@@ -99,7 +99,7 @@ if [[ "$REAL_SOURCE" == "$REAL_DEST" ]]; then
     log "📂 Source and destination directories match; skipping rsync and going straight to git commit..."
 else
     log "📂 Starting rsync sync..."
-    rsync -av --delete --exclude '.git' --exclude '.DS_Store' --exclude '.trash' --exclude '.Trash' --exclude '*.icloud' "$SOURCE_DIR/" "$DEST_DIR/" >> "$LOG_FILE" 2>&1
+    rsync -av --size-only --delete --exclude '.git' --exclude '.DS_Store' --exclude '.trash' --exclude '.Trash' --exclude '*.icloud' "$SOURCE_DIR/" "$DEST_DIR/" >> "$LOG_FILE" 2>&1
     RSYNC_EXIT=$?
 
     if [ $RSYNC_EXIT -eq 0 ]; then
